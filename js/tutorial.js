@@ -1,0 +1,1 @@
+// Capital Life beginner tutorial placeholder. Restored as a dedicated module.
