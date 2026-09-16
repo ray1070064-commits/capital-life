@@ -21,14 +21,14 @@ function renderNativeSettings(state) {
   const connected = Boolean(state.connected);
   const started = Boolean(world.game_started);
   const gameOver = Boolean(world.game_over);
-  const sessionId = String(server.session_id || server.session?.id || '未提供');
+  const sessionId = String(server.session_id || server.session?.id || '後端未提供');
   const activeView = String(state.ui.activeView || 'trading');
 
   return `
     <div class="page-header">
       <div>
         <h1 class="page-title">系統中心</h1>
-        <div class="page-subtitle">連線、Session、存檔與 Native 核心狀態都在這裡集中管理。</div>
+        <div class="page-subtitle">連線、Session、存檔與 Native 核心狀態集中管理。</div>
       </div>
       <div class="toolbar">
         <button class="button" data-system-refresh ${connected ? '' : 'disabled'}>重新整理全部面板</button>
@@ -51,12 +51,12 @@ function renderNativeSettings(state) {
         <div class="metric-grid">
           ${metric('Session', sessionId)}
           ${metric('自動存檔', saveTools.autosave_enabled === false ? '關閉' : '開啟')}
-          ${metric('新版本機存檔', saveTools.exists ? '已存在' : '尚無')}
+          ${metric('正式存檔狀態', saveTools.last_saved_at ? '已有紀錄' : '由瀏覽器檢查')}
         </div>
         <div class="button-row" style="margin-top:14px">
           <button class="button primary" data-save-now ${started && connected ? '' : 'disabled'}>立即儲存</button>
           <button class="button" data-save-load ${connected ? '' : 'disabled'}>載入本機存檔</button>
-          <button class="button" data-system-clear-save>刪除本機存檔</button>
+          <button class="button danger" data-save-delete>刪除本機存檔</button>
         </div>
       </div>
     </section>
