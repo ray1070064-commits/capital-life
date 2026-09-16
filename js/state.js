@@ -17,6 +17,8 @@ const initialState = {
     leverage: 1,
     orderQuantity: 1,
     titleCategory: '全部',
+    assetInfoTab: 'overview',
+    assetInfoNewsFilter: '全部',
     endGameConfirm: false,
     legacy: null,
     chart: null,
