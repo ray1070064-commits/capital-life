@@ -2,6 +2,7 @@ import {
   loadCompanyPanel,
   loadFamilyPanel,
   loadLifePanel,
+  loadMarketPanel,
   loadNewsPanel,
   loadPowerPanel,
   loadProgressPanel,
@@ -13,6 +14,7 @@ import {
   setCompanyPanel,
   setFamilyPanel,
   setLifePanel,
+  setMarketPanel,
   setNewsPanel,
   setPowerPanel,
   setProgressPanel,
@@ -22,6 +24,10 @@ import {
 import { toast } from './ui.js';
 
 const loaders = {
+  trading: async () => {
+    const payload = await loadMarketPanel();
+    setMarketPanel(payload?.market_panel || null);
+  },
   life: async () => {
     const payload = await loadLifePanel();
     setLifePanel(payload?.life_panel || null);
@@ -95,8 +101,6 @@ window.addEventListener('capital-life:refresh-panels', () => {
   if (loaders[view]) refreshView(view, true);
 });
 
-// GameState 由 app.js 更新，但沒有專用的「狀態變更完成」事件；
-// 低頻 TTL 刷新讓新聞、家庭、公司、政治、進度與結算資料不會停留在首次載入的舊內容。
 window.setInterval(() => {
   const state = getState();
   if (!state.connected || !state.server?.world?.game_started) return;
@@ -107,6 +111,7 @@ window.setInterval(() => {
 window.setTimeout(() => {
   const state = getState();
   if (state.connected && state.server?.world?.game_started) {
+    refreshView('trading', true);
     refreshView('life', true);
     refreshView('news', true);
     refreshView('progress', true);
