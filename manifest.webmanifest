@@ -4,7 +4,9 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0b0f17",
-  "theme_color": "#0b0f17",
-  "lang": "zh-Hant"
+  "background_color": "#080c13",
+  "theme_color": "#080c13",
+  "lang": "zh-Hant",
+  "description": "以股票交易為核心，結合投資模擬、人生模擬、職涯、家庭與公司經營的網頁遊戲。",
+  "categories": ["games", "finance", "simulation"]
 }
