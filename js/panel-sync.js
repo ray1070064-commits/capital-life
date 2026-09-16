@@ -4,6 +4,7 @@ import {
   loadLifePanel,
   loadMarketPanel,
   loadNewsPanel,
+  loadPttPanel,
   loadPowerPanel,
   loadProgressPanel,
   loadSaveTools,
@@ -18,6 +19,7 @@ import {
   setNewsPanel,
   setPowerPanel,
   setProgressPanel,
+  setPttPanel,
   setSaveTools,
   setSettlementPanel,
 } from './state.js';
@@ -25,8 +27,9 @@ import { toast } from './ui.js';
 
 const loaders = {
   trading: async () => {
-    const payload = await loadMarketPanel();
-    setMarketPanel(payload?.market_panel || null);
+    const [market, ptt] = await Promise.all([loadMarketPanel(), loadPttPanel()]);
+    setMarketPanel(market?.market_panel || null);
+    setPttPanel(ptt?.ptt_panel || null);
   },
   life: async () => {
     const payload = await loadLifePanel();
@@ -45,6 +48,8 @@ const loaders = {
   news: async () => {
     const payload = await loadNewsPanel();
     setNewsPanel(payload?.news_panel || null);
+    const ptt = await loadPttPanel();
+    setPttPanel(ptt?.ptt_panel || null);
   },
   progress: async () => {
     const payload = await loadProgressPanel();
@@ -69,22 +74,14 @@ async function refreshView(view, force = false) {
   if (!state.connected || !state.server?.world?.game_started) return;
   const loader = loaders[view];
   if (!loader) return;
-
   const now = Date.now();
   if (!force && now - Number(lastLoadedAt.get(view) || 0) < REFRESH_TTL_MS) return;
   if (inFlight.has(view)) return inFlight.get(view);
-
   const promise = (async () => {
-    try {
-      await loader();
-      lastLoadedAt.set(view, Date.now());
-    } catch (error) {
-      toast(error?.message || `無法載入「${view}」資料`, 'error');
-    } finally {
-      inFlight.delete(view);
-    }
+    try { await loader(); lastLoadedAt.set(view, Date.now()); }
+    catch (error) { toast(error?.message || `無法載入「${view}」資料`, 'error'); }
+    finally { inFlight.delete(view); }
   })();
-
   inFlight.set(view, promise);
   return promise;
 }
@@ -96,10 +93,7 @@ function invalidate(view = null) {
 
 window.addEventListener('capital-life:refresh-panels', () => {
   const view = String(getState().ui.activeView || '');
-  if (loaders[view]) {
-    invalidate(view);
-    void refreshView(view, true);
-  }
+  if (loaders[view]) { invalidate(view); void refreshView(view, true); }
 });
 
 document.addEventListener('click', event => {
