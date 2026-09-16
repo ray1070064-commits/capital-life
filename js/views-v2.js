@@ -10,6 +10,7 @@ import { renderNativePower } from './power.js';
 import { renderNativeSave } from './save.js';
 import { renderNativeSettlement } from './settlement.js';
 import { renderAdvancedTrading } from './trading.js';
+import { renderAssetInfo } from './asset-info.js';
 
 function metric(label, value) {
   return `<div class="metric-card"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`;
@@ -84,7 +85,10 @@ function renderNativeSettings(state) {
 export function renderView(state) {
   if (state?.ui?.activeView === 'start') return renderLaunchScreen(state);
   if (state?.ui?.activeView === 'settlement') return renderNativeSettlement(state);
-  if (state?.ui?.activeView === 'trading') return renderAdvancedTrading(state);
+  if (state?.ui?.activeView === 'trading') {
+    const selected = state.ui.selectedSymbol || state.ui.marketPanel?.selected_symbol || state.server?.market?.selected_symbol;
+    return `${renderAdvancedTrading(state)}${renderAssetInfo(state, selected)}`;
+  }
   if (state?.ui?.activeView === 'life') return `${renderNativeLife(state)}${renderFamilySections(state)}`;
   if (state?.ui?.activeView === 'company') return `${renderNativeCompany(state)}${renderCompanyParity(state.ui.companyPanel)}`;
   if (state?.ui?.activeView === 'politics') return renderNativePower(state);
