@@ -55,20 +55,23 @@ const loaders = {
 };
 
 const inFlight = new Map();
-const loaded = new Set();
+const lastLoadedAt = new Map();
+const REFRESH_TTL_MS = 4500;
 
 async function refreshView(view, force = false) {
   const state = getState();
   if (!state.connected || !state.server?.world?.game_started) return;
   const loader = loaders[view];
   if (!loader) return;
-  if (!force && loaded.has(view)) return;
+
+  const now = Date.now();
+  if (!force && now - Number(lastLoadedAt.get(view) || 0) < REFRESH_TTL_MS) return;
   if (inFlight.has(view)) return inFlight.get(view);
 
   const promise = (async () => {
     try {
       await loader();
-      loaded.add(view);
+      lastLoadedAt.set(view, Date.now());
     } catch (error) {
       toast(error?.message || `無法載入「${view}」資料`, 'error');
     } finally {
@@ -84,11 +87,16 @@ document.addEventListener('click', event => {
   const nav = event.target.closest('.nav-button[data-view]');
   if (!nav) return;
   const view = String(nav.dataset.view || '');
-  if (loaders[view]) window.setTimeout(() => refreshView(view), 0);
+  if (loaders[view]) window.setTimeout(() => refreshView(view, true), 0);
 });
 
-// GameState 由 app.js 更新，但不發出專用的「新遊戲完成」事件；
-// 因此用低頻輪詢補上首次進入各頁的資料同步，避免頁面長期停在空殼。
+window.addEventListener('capital-life:refresh-panels', () => {
+  const view = String(getState().ui.activeView || '');
+  if (loaders[view]) refreshView(view, true);
+});
+
+// GameState 由 app.js 更新，但沒有專用的「狀態變更完成」事件；
+// 低頻 TTL 刷新讓新聞、家庭、公司、政治、進度與結算資料不會停留在首次載入的舊內容。
 window.setInterval(() => {
   const state = getState();
   if (!state.connected || !state.server?.world?.game_started) return;
@@ -96,12 +104,11 @@ window.setInterval(() => {
   if (loaders[view]) refreshView(view);
 }, 1500);
 
-// 玩家從新遊戲／存檔返回交易頁後，先預熱首頁之外最常用的資訊頁。
 window.setTimeout(() => {
   const state = getState();
   if (state.connected && state.server?.world?.game_started) {
-    refreshView('life');
-    refreshView('news');
-    refreshView('progress');
+    refreshView('life', true);
+    refreshView('news', true);
+    refreshView('progress', true);
   }
 }, 1200);
