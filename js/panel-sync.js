@@ -89,16 +89,25 @@ async function refreshView(view, force = false) {
   return promise;
 }
 
-document.addEventListener('click', event => {
-  const nav = event.target.closest('.nav-button[data-view]');
-  if (!nav) return;
-  const view = String(nav.dataset.view || '');
-  if (loaders[view]) window.setTimeout(() => refreshView(view, true), 0);
-});
+function invalidate(view = null) {
+  if (view) lastLoadedAt.delete(view);
+  else lastLoadedAt.clear();
+}
 
 window.addEventListener('capital-life:refresh-panels', () => {
   const view = String(getState().ui.activeView || '');
-  if (loaders[view]) refreshView(view, true);
+  if (loaders[view]) {
+    invalidate(view);
+    void refreshView(view, true);
+  }
+});
+
+document.addEventListener('click', event => {
+  if (!event.target.closest('[data-system-refresh]')) return;
+  invalidate();
+  const views = Object.keys(loaders);
+  void Promise.all(views.map(view => refreshView(view, true)));
+  toast('全部 Native 面板已要求重新整理。', 'success');
 });
 
 window.setInterval(() => {
