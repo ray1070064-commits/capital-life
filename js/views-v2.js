@@ -75,7 +75,7 @@ function renderNativeSettings(state) {
       <div class="panel-header">Native 核心覆蓋</div>
       <div class="panel-body">
         <div class="content-grid three">
-          ${['股票交易','市場新聞 / PTT','人生 / 家庭','公司 / IPO','政治 / 法律','生涯 / 稱號'].map(label => `<article class="content-card"><strong>${escapeHtml(label)}</strong><p class="muted">由私有後端 GameState 驅動，前端不保存核心規則。</p></article>`).join('')}
+          ${['股票交易','新聞／PTT內容中心','人生 / 家庭','公司 / IPO','政治 / 法律','生涯 / 稱號'].map(label => `<article class="content-card"><strong>${escapeHtml(label)}</strong><p class="muted">由私有後端 GameState 驅動，前端不保存核心規則。</p></article>`).join('')}
         </div>
       </div>
     </section>
