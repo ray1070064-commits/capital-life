@@ -302,12 +302,22 @@ document.addEventListener('click', async event => {
     const side = document.getElementById('order-action')?.value || 'open';
     const positionSide = document.getElementById('position-side')?.value || 'SPOT';
     const orderType = document.getElementById('order-type')?.value || 'market';
+    const orderSizing = String(document.getElementById('order-sizing')?.value || getState().ui.orderSizing || 'quantity');
     const quantity = Number(document.getElementById('order-quantity')?.value || 0);
+    const notional = Number(document.getElementById('order-notional')?.value || 0);
     const leverage = Math.max(1, Math.floor(Number(document.getElementById('order-leverage')?.value || 1)));
     const limitPrice = optionalPositiveNumber('order-limit-price');
 
-    if (!symbol || !Number.isFinite(quantity) || quantity <= 0) {
-      toast('請選擇標的並輸入有效數量。', 'error');
+    if (!symbol) {
+      toast('請先選擇交易標的。', 'error');
+      return;
+    }
+    if (orderSizing === 'notional' && (!Number.isFinite(notional) || notional < 10)) {
+      toast('投入金額必須至少 10 USD。', 'error');
+      return;
+    }
+    if (orderSizing !== 'notional' && (!Number.isFinite(quantity) || quantity <= 0)) {
+      toast('請輸入有效數量。', 'error');
       return;
     }
     if (orderType === 'limit' && !Number.isFinite(limitPrice)) {
@@ -315,7 +325,9 @@ document.addEventListener('click', async event => {
       return;
     }
 
-    const payload = { symbol, side, position_side: positionSide, order_type: orderType, quantity, leverage };
+    const payload = { symbol, side, position_side: positionSide, order_type: orderType, leverage };
+    if (orderSizing === 'notional') payload.notional = notional;
+    else payload.quantity = quantity;
     if (orderType === 'limit') payload.limit_price = limitPrice;
     await execute('trade', payload);
     return;
