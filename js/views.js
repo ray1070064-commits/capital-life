@@ -206,7 +206,7 @@ export function renderPolitics(state) {
 export function renderNews(state) {
   const items = Array.isArray(state.server?.news?.items) ? state.server.news.items : [];
   return `
-    ${pageHeader('市場新聞', '新聞內容由後端產生或整理，前端只負責顯示。')}
+    ${pageHeader('新聞中心', '新聞內容由後端產生或整理，前端只負責顯示。')}
     <section class="panel">
       <div class="panel-header">最新市場消息</div>
       <div class="panel-body">
