@@ -1,6 +1,6 @@
 // Shared API contract for the native web game.
- // The public frontend uses only semantic GameEngine actions; legacy UI controls
- // are no longer part of the production browser path.
+// The public frontend uses only semantic GameEngine actions; legacy UI controls
+// are no longer part of the production browser path.
 export const CORE_CONTRACT = Object.freeze({
   frontendRepository: 'ray1070064-commits/capital-life',
   domains: [
