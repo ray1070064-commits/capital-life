@@ -40,8 +40,10 @@ function stateFromResponse(payload) {
   return payload.state || payload.game_state || payload;
 }
 
-function chartLimitForRange(range) {
-  return ({ '1M': 40, '3M': 110, '1Y': 380, '3Y': 1120, ALL: 2000 })[range] || 380;
+function chartLimitForRange(range, customDays = null) {
+  const days = Number(customDays);
+  if (Number.isFinite(days) && days >= 30) return Math.max(30, Math.min(2000, Math.floor(days)));
+  return ({ '1M': 40, '3M': 110, '1Y': 380, '3Y': 1120, ALL: 2000 })[range] || 40;
 }
 
 function optionalPositiveNumber(id) {
@@ -136,7 +138,7 @@ async function refreshLife() {
 async function refreshChart(symbol) {
   if (!getState().connected || !symbol) return;
   try {
-    const limit = chartLimitForRange(getState().ui.chartRange);
+    const limit = chartLimitForRange(getState().ui.chartRange, getState().ui.chartDays);
     setChart(await loadChart(symbol, limit));
   } catch (error) {
     setChart(null);
@@ -224,6 +226,13 @@ document.addEventListener('change', event => {
   const key = trading.dataset.tradingUi;
   let value = trading.value;
   if (key === 'leverage') value = Math.max(1, Number(value) || 1);
+  if (key === 'chartDays') {
+    value = Math.max(30, Math.min(2000, Math.floor(Number(value) || 30)));
+    patchUI({ chartDays: value, chartRange: 'CUSTOM' });
+    const symbol = getState().ui.selectedSymbol || getState().server?.market?.selected_symbol;
+    if (symbol) void refreshChart(symbol);
+    return;
+  }
   patchUI({ [key]: value });
 });
 
@@ -280,7 +289,7 @@ document.addEventListener('click', async event => {
 
   const chartRange = event.target.closest('[data-chart-range]');
   if (chartRange) {
-    patchUI({ chartRange: chartRange.dataset.chartRange || '1Y' });
+    patchUI({ chartRange: chartRange.dataset.chartRange || '1Y', chartDays: null });
     const symbol = getState().ui.selectedSymbol || getState().server?.market?.selected_symbol;
     if (symbol) await refreshChart(symbol);
     return;
