@@ -23,19 +23,6 @@ function fund(info) {
   return `<div class="asset-info-content"><div class="fund-summary"><span>年費率</span><strong>${escapeHtml(pct(info.fund.expenseRatio,3))}</strong></div><div class="component-list">${components.map(row => `<div class="component-row"><div class="component-label"><strong>${escapeHtml(row.symbol)}</strong><span>${escapeHtml(row.name)}</span></div><div class="component-track"><i style="width:${Math.max(4, Number(row.weight || 0) / max * 100)}%"></i></div><strong>${escapeHtml(pct(row.weight,1))}</strong></div>`).join('')}</div></div>`;
 }
 
-function news(info, filter) {
-  const levels = ['全部','重大','重要','財報','一般'];
-  const rows = (Array.isArray(info.news) ? info.news : []).filter(row => filter === '全部' || String(row.importance || '一般') === filter);
-  return `<div class="asset-info-content"><div class="news-filter">${levels.map(level => `<button class="button compact ${level === filter ? 'primary' : ''}" data-asset-info-filter="${escapeHtml(level)}">${escapeHtml(level)}</button>`).join('')}</div><div class="structured-news-list">${rows.length ? rows.map(row => `<article class="structured-news-row"><div class="news-badges"><span>${escapeHtml(row.importance || '一般')}</span><span>${escapeHtml(row.category || '市場')}</span><span>Day ${Number(row.day || 0)}</span></div><strong>${escapeHtml(row.title || '市場消息')}</strong><p>${escapeHtml(row.desc || '')}</p></article>`).join('') : '<div class="empty-state">目前沒有符合條件的新聞。</div>'}</div></div>`;
-}
-
-function ptt(state) {
-  const p = state.ui.pttPanel || {};
-  const rows = Array.isArray(p.rows) ? p.rows : [];
-  const marker = prefix => prefix === '推' ? '🟢' : prefix === '噓' ? '🔴' : '⚪';
-  return `<div class="asset-info-content"><div class="ptt-toolbar"><strong>模擬鄉民聊天室</strong><button class="button compact" data-ptt-refresh ${state.connected ? '' : 'disabled'}>換一批</button></div><div class="ptt-feed">${rows.length ? rows.map(row => `<div class="ptt-row"><strong>${marker(row.prefix)} ${escapeHtml(row.user)}</strong><span>${escapeHtml(row.message)}</span></div>`).join('') : '<div class="empty-state">PTT 資訊載入中。</div>'}</div></div>`;
-}
-
 function depth(info) {
   const d = info.depth || { bids: [], asks: [], spreadPct: 0, imbalance: 0 };
   const bids = Array.isArray(d.bids) ? d.bids : [];
@@ -49,13 +36,10 @@ export function renderAssetInfo(state, selected) {
   const info = state.ui.marketPanel?.asset_info;
   if (!info || String(info.symbol) !== String(selected)) return '';
   const tab = String(state.ui.assetInfoTab || 'overview');
-  const filter = String(state.ui.assetInfoNewsFilter || '全部');
-  const tabs = [['overview','概況'],['dividend','配息／收益'],...(info.fund ? [['fund','ETF 成分']] : []),['news','新聞'],['ptt','PTT'],['depth','市場深度']];
+  const tabs = [['overview','概況'],['dividend','配息／收益'],...(info.fund ? [['fund','ETF 成分']] : []),['depth','市場深度']];
   let body = overview(info);
   if (tab === 'dividend') body = dividend(info);
   else if (tab === 'fund') body = fund(info);
-  else if (tab === 'news') body = news(info, filter);
-  else if (tab === 'ptt') body = ptt(state);
   else if (tab === 'depth') body = depth(info);
   return `<section class="panel asset-info-panel"><div class="panel-header">${escapeHtml(info.profile?.category || '標的')}｜${escapeHtml(selected)}｜${escapeHtml(info.profile?.sector || '')}</div><div class="asset-info-tabs">${tabs.map(([id,label]) => `<button class="button compact ${id === tab ? 'primary' : ''}" data-asset-info-tab="${id}">${escapeHtml(label)}</button>`).join('')}</div>${body}</section>`;
 }
