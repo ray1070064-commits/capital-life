@@ -179,8 +179,14 @@ export function renderAdvancedTrading(state) {
           <div class="field"><label>部位</label><select id="position-side" class="select" data-trading-ui="positionSide"><option value="SPOT" ${ui.positionSide === 'SPOT' ? 'selected' : ''}>SPOT 現貨</option><option value="LONG" ${ui.positionSide === 'LONG' ? 'selected' : ''}>LONG 多單</option><option value="SHORT" ${ui.positionSide === 'SHORT' ? 'selected' : ''}>SHORT 空單</option></select></div>
           <div class="field"><label>委託類型</label><select id="order-type" class="select" data-trading-ui="orderType"><option value="market" ${ui.orderType === 'limit' ? '' : 'selected'}>市價</option><option value="limit" ${ui.orderType === 'limit' ? 'selected' : ''}>限價</option></select></div>
           <div class="field"><label>槓桿</label><input id="order-leverage" class="input" type="number" min="1" step="1" value="${escapeHtml(ui.leverage || 1)}" /></div>
+          <div class="field"><label>下單單位</label><select id="order-sizing" class="select" data-trading-ui="orderSizing">
+            <option value="quantity" ${ui.orderSizing === 'notional' ? '' : 'selected'}>數量</option>
+            <option value="notional" ${ui.orderSizing === 'notional' ? 'selected' : ''}>投入金額</option>
+          </select></div>
         </div>
-        <div class="field"><label>數量</label><input id="order-quantity" class="input" type="number" min="0.000001" step="any" value="${escapeHtml(ui.orderQuantity || 1)}" /></div>
+        ${ui.orderSizing === 'notional'
+          ? `<div class="field"><label>投入金額 USD</label><input id="order-notional" class="input" type="number" min="10" step="100" value="${escapeHtml(ui.orderNotional || 1000)}" /></div>`
+          : `<div class="field"><label>數量</label><input id="order-quantity" class="input" type="number" min="0.000001" step="any" value="${escapeHtml(ui.orderQuantity || 1)}" /></div>`}
         <div class="field"><label>限價（市價單可留空）</label><input id="order-limit-price" class="input" type="number" min="0.000001" step="any" placeholder="${escapeHtml(asset?.price ?? '')}" /></div>
         <button class="button primary full" data-advanced-trade ${disabledAttr(connected || !selected)}>送出委託</button>
         <div class="trade-divider"></div><strong class="section-label">停損／停利／移動停損</strong>
