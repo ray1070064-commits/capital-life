@@ -26,7 +26,11 @@ export const CORE_CONTRACT = Object.freeze({
   ],
   legacyCompatibility: Object.freeze({
     enabled: true,
-    controlCount: 145,
+    // Source-of-truth inventory from app.py:
+    // 144 unique literal widget keys + 51 dynamic/no-key widget callsites.
+    fixedControlKeyCount: 144,
+    dynamicWidgetCallSiteCount: 51,
+    totalWidgetCallSites: 195,
     endpoint: '/ui',
     action: 'legacy_widget',
   }),
