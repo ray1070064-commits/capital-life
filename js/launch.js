@@ -158,6 +158,11 @@ export function renderLaunchScreen(state) {
             <span><strong>啟用股票核心教學</strong><small>第一次遊玩建議開啟</small></span>
           </label>
 
+          <div class="launch-quick-actions">
+            <button class="button" data-game-action="quick_start" ${ready ? '' : 'disabled'}>快速開始／隨機人生</button>
+            <button class="button" data-quick-reroll ${ready ? '' : 'disabled'}>重新隨機</button>
+          </div>
+
           <button class="launch-start-button" data-game-action="new_game" ${ready ? '' : 'disabled'}>
             <span>開始遊戲</span><b>→</b>
           </button>
