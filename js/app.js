@@ -4,7 +4,6 @@ import {
   healthCheck,
   loadChart,
   loadGameState,
-  loadLegacyUi,
   loadLifePanel,
   loadStartupConfig,
   sendGameAction,
@@ -19,14 +18,12 @@ import {
   patchUI,
   setChart,
   setConnected,
-  setLegacyUi,
   setLifePanel,
   setServerState,
   setStartup,
   subscribe,
 } from './state.js';
 import { renderView } from './views-v2.js';
-import { collectLegacyInputs, renderLegacyCompatibility } from './legacy.js';
 import { drawMarketChart } from './chart.js';
 import { formatMoney, toast } from './ui.js';
 
@@ -103,27 +100,11 @@ function renderChrome(state) {
 function render() {
   const state = getState();
   renderChrome(state);
-  if (state.ui.activeView === 'full') {
-    viewRoot.innerHTML = renderLegacyCompatibility(state.ui.legacy, state.connected);
-  } else {
-    viewRoot.innerHTML = renderView(state);
-    if (state.ui.activeView === 'trading') drawMarketChart(state.ui.chart, state.ui);
-  }
+  viewRoot.innerHTML = renderView(state);
+  if (state.ui.activeView === 'trading') drawMarketChart(state.ui.chart, state.ui);
 }
 
 subscribe(render);
-
-async function refreshLegacy() {
-  if (!getState().connected) return;
-  try {
-    const payload = await loadLegacyUi();
-    const serverState = stateFromResponse(payload);
-    if (serverState) setServerState(serverState);
-    setLegacyUi(payload?.ui || null);
-  } catch (error) {
-    toast(error?.message || '無法載入完整功能控制項', 'error');
-  }
-}
 
 async function refreshLife() {
   if (!getState().connected || !getState().server?.world?.game_started) return;
@@ -156,7 +137,6 @@ async function execute(action, payload = {}, options = {}) {
     const response = await sendGameAction(action, payload, options);
     const nextState = stateFromResponse(response);
     if (nextState) setServerState(nextState);
-    if (response?.ui) setLegacyUi(response.ui);
     if (nextState?.world?.game_started) scheduleEncryptedAutosave();
     if (!options.silent) toast(response?.message || '操作完成', 'success');
     return response;
@@ -213,13 +193,6 @@ async function selectSymbol(symbol) {
   if (response) await refreshChart(symbol);
 }
 
-document.addEventListener('input', event => {
-  const slider = event.target.closest('[data-legacy-input][data-legacy-kind="slider"]');
-  if (!slider) return;
-  const output = document.querySelector(`[data-legacy-value-for="${CSS.escape(slider.dataset.legacyInput || '')}"]`);
-  if (output) output.textContent = slider.value;
-});
-
 document.addEventListener('change', event => {
   const trading = event.target.closest('[data-trading-ui]');
   if (!trading) return;
@@ -260,24 +233,7 @@ document.addEventListener('click', async event => {
   const nav = event.target.closest('.nav-button[data-view]');
   if (nav) {
     patchUI({ activeView: nav.dataset.view });
-    if (nav.dataset.view === 'full') await refreshLegacy();
     if (nav.dataset.view === 'life') await refreshLife();
-    return;
-  }
-
-  const legacyRefresh = event.target.closest('[data-legacy-refresh]');
-  if (legacyRefresh) {
-    await refreshLegacy();
-    return;
-  }
-
-  const legacyButton = event.target.closest('[data-legacy-button]');
-  if (legacyButton) {
-    const inputs = collectLegacyInputs(document);
-    await execute('legacy_widget', {
-      control_id: legacyButton.dataset.legacyButton,
-      inputs,
-    }, { silent: true });
     return;
   }
 
