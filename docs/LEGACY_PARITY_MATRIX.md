@@ -1,4 +1,4 @@
-# Legacy → Native 完整 Parity Matrix
+# Legacy → Native Parity Audit
 
 > 驗證日期：2026-09-18。此文件把舊 `app.py` 的互動 widget inventory 與目前 `capital-life` Native UI／FastAPI action 對照。`145` 原先是前端 contract 的硬編碼數字，不是舊核心可驗證的固定控制項數量；目前原始碼證明為 **144 個唯一固定 literal key + 51 個 dynamic/no-key widget callsite = 195 個 widget callsite**。因此不製造不存在的第 145 個固定控制項。
 
@@ -222,8 +222,10 @@
 ### 145/145 為何不能直接宣稱 PASS
 `controlCount: 145` 是 `capital-life` 的 contract 常數，2026-09-16 才加入；對照舊核心後，Git/AST inventory 實際得到 144 個唯一 literal keys、195 個 widget callsites，其中 51 個使用動態 key 或沒有 key。因此「補一個假控制項」會讓驗證失真。
 
-### Runtime legacy bridge
-舊 UI 仍可以透過 `legacy_widget` 相容層執行。Native 路徑不應把 legacy bridge 當作主要 UI；本表將「Native 功能等價」與「舊版 compatibility」分開記錄。
+### Production status
+本表是歷史來源碼盤點與 Native 重構驗證紀錄；目前生產前端已移除 runtime legacy bridge。瀏覽器不再渲染舊 UI，也不再送出 `legacy_widget`。
+
+舊版 `legacy-save` 匯入／匯出屬於資料遷移工具，與遊戲 UI 相容層分開。
 
 ### UI-only controls
 導航、tabs、篩選器本身沒有必要產生 backend action；它們改變 Native state 或視圖後，真正的遊戲操作才送至 backend。
@@ -231,6 +233,6 @@
 ## 驗證標準
 
 1. Legacy source inventory：`195` widget callsites / `144` fixed literal keys / `51` dynamic or no-key。
-2. Backend dispatch：`engine.py` 可辨識交易、時間、life、family、company、politics、underworld、insider、content、save、settlement 與 legacy compatibility action family。
+2. Backend dispatch：Native GameEngine 可辨識交易、時間、life、family、company、politics、underworld、insider、content、save、settlement action families；legacy UI action 不再屬於 production browser contract。
 3. Native event binding：`app.js`、`market-events.js`、`family-events.js`、`company-events.js`、`power-events.js`、`content-events.js`、`save-events.js`、`settlement-events.js` 均有對應送出路徑。
 4. Functional regression：完整遊戲生命週期測試涵蓋 new game → trade → advance → panels → save → settlement → game-over block → restore → restart。
