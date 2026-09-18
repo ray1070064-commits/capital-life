@@ -6,10 +6,6 @@ document.addEventListener('click', event => {
     patchUI({ assetInfoTab: String(tab.dataset.assetInfoTab || 'overview') });
     return;
   }
-  const filter = event.target.closest('[data-asset-info-filter]');
-  if (filter) {
-    patchUI({ assetInfoNewsFilter: String(filter.dataset.assetInfoFilter || '全部'), assetInfoTab: 'news' });
-  }
 });
 
 window.addEventListener('capital-life:refresh-panels', () => {
