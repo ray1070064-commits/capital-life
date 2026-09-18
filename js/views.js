@@ -208,7 +208,7 @@ export function renderNews(state) {
   return `
     ${pageHeader('市場新聞', '新聞內容由後端產生或整理，前端只負責顯示。')}
     <section class="panel">
-      <div class="panel-header">最新消息</div>
+      <div class="panel-header">最新市場消息</div>
       <div class="panel-body">
         ${items.length ? items.map(item => `
           <article class="feature-card" style="margin-bottom:10px;min-height:0">
