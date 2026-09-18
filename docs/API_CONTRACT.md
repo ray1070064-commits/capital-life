@@ -48,7 +48,7 @@ Authorization: Bearer <session_token>
 
 可選：
 
-`GET /api/game/state?include_ui=true`
+`GET /api/game/state`
 
 回傳範例：
 
@@ -259,30 +259,13 @@ Authorization: Bearer <session_token>
 
 後端必須自行驗證所有輸入，不可信任前端提供的價格、現金、持股、事件結果、候選人資料、教育結果、公司估值、董事會結果、IPO 價格、政治成功結果、法律案件結果或解鎖狀態。
 
-## 完整功能相容模式
+## Native-only 原則
 
-遷移期間不能因為 API 尚未語意化就刪功能，因此另有：
+公開 GitHub Pages 前端只使用語意化的 Native UI 與 GameEngine actions；生產環境不再提供「完整功能相容模式」、`/api/game/ui` 或 `legacy_widget` 瀏覽器操作入口。
 
-`GET /api/game/ui`
+舊版存檔的匯入／匯出仍保留在獨立的 `/api/game/legacy-save/*` 端點，目的只是讓既有玩家能遷移資料，不代表舊版 UI 仍是遊戲操作路徑。
 
-後端會把舊版 UI 的**公開控制項描述**轉成 JSON；不會把 Python、公式或事件資料庫傳給前端。
-
-尚未轉成 semantic action 的舊功能可以送：
-
-```json
-{
-  "action": "legacy_widget",
-  "payload": {
-    "control_id": "apply_job_btn",
-    "inputs": {
-      "某個控制項 ID": 1
-    }
-  },
-  "action_id": "UUID"
-}
-```
-
-這是遷移保底機制。高頻功能會逐步直接改成 GameEngine handler；完整功能模式則確保尚未重構的功能仍可操作。
+所有新功能應直接新增 Native panel、semantic action 與對應 FastAPI handler。
 
 ## 加密瀏覽器存檔
 
