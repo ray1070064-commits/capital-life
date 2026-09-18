@@ -229,8 +229,6 @@ export async function loadGameState(includeUi = false) {
   return request(`/state?include_ui=${includeUi ? 'true' : 'false'}`, { method: 'GET' });
 }
 
-export async function loadLegacyUi() { return request('/ui', { method: 'GET' }); }
-
 export async function loadChart(symbol, limit = 365) {
   return request(`/chart/${encodeURIComponent(symbol)}?limit=${encodeURIComponent(limit)}`, { method: 'GET' });
 }
@@ -246,7 +244,6 @@ export async function sendGameAction(action, payload = {}, options = {}) {
       action,
       payload,
       action_id: crypto.randomUUID(),
-      include_ui: Boolean(options.includeUi),
     }),
   });
 }
