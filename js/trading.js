@@ -103,8 +103,11 @@ function renderProtectiveOrders(protective, selected, connected) {
 function indicatorTools(state) {
   const cfg = state.ui.marketPanel?.indicators || { mode: 'volume', ma1: 20, ma2: 50, ma3: 200, rsi_period: 14, macd_fast: 12, macd_slow: 26, macd_signal: 9 };
   const ranges = ['1M', '3M', '1Y', '3Y', 'ALL'];
+  const mappedDays = { '1M': 40, '3M': 110, '1Y': 380, '3Y': 1120, 'ALL': 2000 };
+  const chartDays = Number(state.ui.chartDays || mappedDays[state.ui.chartRange] || 40);
   return `<div class="chart-toolbar">
     <div class="segmented">${ranges.map(range => `<button class="button ${state.ui.chartRange === range ? 'primary' : ''}" data-chart-range="${range}">${range}</button>`).join('')}</div>
+    <label class="chart-days-control">圖表天數 <strong>${chartDays}</strong><input id="chart-days" type="range" min="30" max="2000" step="10" value="${chartDays}" data-trading-ui="chartDays"></label>
     <details class="indicator-settings"><summary>技術指標</summary>
       <div class="indicator-form">
         <select id="indicator-mode" class="select compact"><option value="volume" ${cfg.mode === 'volume' ? 'selected' : ''}>成交量</option><option value="rsi" ${cfg.mode === 'rsi' ? 'selected' : ''}>RSI</option><option value="macd" ${cfg.mode === 'macd' ? 'selected' : ''}>MACD</option></select>
