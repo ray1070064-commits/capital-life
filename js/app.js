@@ -51,6 +51,35 @@ function optionalPositiveNumber(id) {
   return Number.isFinite(value) && value > 0 ? value : NaN;
 }
 
+function randomInt(min, max) {
+  if (window.crypto?.getRandomValues) {
+    const buf = new Uint32Array(1);
+    window.crypto.getRandomValues(buf);
+    return min + (buf[0] % (max - min + 1));
+  }
+  return min + Math.floor(Math.random() * (max - min + 1));
+}
+
+function chooseQuickStart(config) {
+  const jobs = Array.isArray(config?.jobs) ? config.jobs : [];
+  if (!jobs.length) return null;
+  const job = jobs[randomInt(0, jobs.length - 1)];
+  const minBalance = Number(config?.balance?.min ?? 10000);
+  const maxBalance = Number(config?.balance?.max ?? 5000000);
+  const balanceStep = Number(config?.balance?.step ?? 10000);
+  const minAge = Number(config?.age?.min ?? 18);
+  const maxAge = Number(config?.age?.max ?? 60);
+  const age = randomInt(minAge, maxAge);
+  const steps = Math.max(0, Math.floor((maxBalance - minBalance) / Math.max(1, balanceStep)));
+  const balance = minBalance + randomInt(0, steps) * Math.max(1, balanceStep);
+  return {
+    jobKey: String(job.key || ''),
+    age,
+    balance: Math.min(maxBalance, balance),
+    seed: '',
+  };
+}
+
 function renderChrome(state) {
   const server = state.server || {};
   const world = server.world || {};
@@ -199,6 +228,26 @@ document.addEventListener('change', event => {
 });
 
 document.addEventListener('click', async event => {
+  const quickReroll = event.target.closest('[data-quick-reroll]');
+  if (quickReroll) {
+    const config = getState().ui.startup || {};
+    const pick = chooseQuickStart(config);
+    if (!pick) {
+      toast('後端尚未提供快速開局資料。', 'error');
+      return;
+    }
+    const balance = document.getElementById('start-balance');
+    const age = document.getElementById('start-age');
+    const job = document.getElementById('start-job');
+    const seed = document.getElementById('start-seed');
+    if (balance) balance.value = String(pick.balance);
+    if (age) age.value = String(pick.age);
+    if (job) job.value = pick.jobKey;
+    if (seed) seed.value = '';
+    toast('已重新隨機起始資金、年齡與工作。', 'success');
+    return;
+  }
+
   const nav = event.target.closest('.nav-button[data-view]');
   if (nav) {
     patchUI({ activeView: nav.dataset.view });
@@ -399,7 +448,24 @@ document.addEventListener('click', async event => {
   if (!actionButton) return;
   const action = actionButton.dataset.gameAction;
 
-  if (action === 'new_game') {
+  if (action === 'quick_start') {
+    const config = getState().ui.startup || {};
+    const pick = chooseQuickStart(config);
+    if (!pick) {
+      toast('後端尚未提供快速開局資料。', 'error');
+      return;
+    }
+    const balance = document.getElementById('start-balance');
+    const age = document.getElementById('start-age');
+    const job = document.getElementById('start-job');
+    const seed = document.getElementById('start-seed');
+    if (balance) balance.value = String(pick.balance);
+    if (age) age.value = String(pick.age);
+    if (job) job.value = pick.jobKey;
+    if (seed) seed.value = '';
+  }
+
+  if (action === 'new_game' || action === 'quick_start') {
     const initBalance = Number(document.getElementById('start-balance')?.value || 0);
     const jobKey = String(document.getElementById('start-job')?.value || '');
     const startAge = Number(document.getElementById('start-age')?.value || 0);
