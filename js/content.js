@@ -37,7 +37,7 @@ export function renderNativeNews(state) {
   const pending = [events.life_pending, events.company_pending].filter(Boolean);
 
   return `
-    ${pageHeader('市場新聞與事件', '新聞、事件與 PTT 鄉民牆都由私有後端產生或整理。')}
+    ${pageHeader('新聞中心', '新聞、事件與 PTT 鄉民牆都由私有後端產生或整理。')}
     <section class="panel"><div class="panel-header">總體環境</div><div class="panel-body"><div class="metric-grid">
       ${metric('VIX', Number(macro.vix || 0).toFixed(1))}${metric('CPI', `${Number(macro.cpi || 0).toFixed(2)}%`)}${metric('利率', `${Number(macro.interest_rate || 0).toFixed(2)}%`)}${metric('失業率', `${Number(macro.unemployment_rate || 0).toFixed(2)}%`)}${metric('市場不確定性', Number(macro.market_uncertainty || 0).toFixed(1))}
     </div></div></section>
