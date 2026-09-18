@@ -503,7 +503,7 @@ async function boot() {
       toast(restoreError?.message || '本機存檔無法恢復，將使用新的 Session。', 'error');
     }
 
-    if (!payload) payload = await loadGameState(false);
+    if (!payload) payload = await loadGameState();
     const serverState = stateFromResponse(payload);
     if (serverState) {
       setServerState(serverState);
