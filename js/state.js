@@ -16,6 +16,8 @@ const initialState = {
     orderType: 'market',
     leverage: 1,
     orderQuantity: 1,
+    orderSizing: 'quantity',
+    orderNotional: 1000,
     titleCategory: '全部',
     assetInfoTab: 'overview',
     assetInfoNewsFilter: '全部',
