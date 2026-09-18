@@ -23,7 +23,6 @@ const initialState = {
     assetInfoTab: 'overview',
     assetInfoNewsFilter: '全部',
     endGameConfirm: false,
-    legacy: null,
     chart: null,
     startup: null,
     marketPanel: null,
@@ -74,6 +73,5 @@ export function setProgressPanel(payload) { state.ui.progressPanel = payload || 
 export function setSettlementPanel(payload) { state.ui.settlementPanel = payload || null; emit(); }
 export function setSaveTools(payload) { state.ui.saveTools = payload || null; emit(); }
 export function setLegacySaveExport(payload) { state.ui.legacySaveExport = payload || null; emit(); }
-export function setLegacyUi(payload) { state.ui.legacy = payload || null; emit(); }
 export function setChart(payload) { state.ui.chart = payload || null; emit(); }
 export function setConnected(value) { state.connected = Boolean(value); emit(); }
