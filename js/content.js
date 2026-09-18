@@ -27,7 +27,7 @@ function renderPtt(state) {
 
 export function renderNativeNews(state) {
   const panel = state.ui.newsPanel;
-  if (!panel) return `${pageHeader('市場新聞與事件', '新聞與事件結果由私有後端整理。')}<div class="empty-state panel">正在載入新聞／事件資料…</div>`;
+  if (!panel) return `${pageHeader('新聞中心', '新聞與事件結果由私有後端整理。')}<div class="empty-state panel">正在載入新聞／事件資料…</div>`;
   const macro = panel.macro || {};
   const events = panel.events || {};
   const feed = Array.isArray(panel.feed) ? panel.feed : [];
@@ -46,7 +46,7 @@ export function renderNativeNews(state) {
       <section class="panel"><div class="panel-header">目前生效中</div><div class="panel-body content-stack">${activeMarket.map(ev => eventCard(`${ev.ticker || ev.symbol}｜${ev.title}`, '', `剩 ${Number(ev.remaining_days || 0)} 天`)).join('')}${activeCompany.map(ev => eventCard(`公司｜${ev.title}`, '', `剩 ${Number(ev.remaining_days || 0)} 天`)).join('')}${illnesses.map(ev => eventCard(`健康｜${ev.name}`, '', ev.remaining_days ? `剩 ${Number(ev.remaining_days)} 天` : '')).join('')}${!activeMarket.length && !activeCompany.length && !illnesses.length ? '<div class="empty-state">目前沒有持續事件效果。</div>' : ''}</div></section>
     </div>
     ${renderPtt(state)}
-    <section class="panel"><div class="panel-header">最新消息</div><div class="panel-body news-feed-native">${feed.length ? feed.map(item => eventCard(item.title || '市場消息', item.summary || '', `Day ${Number(item.day || 0)}${item.importance ? `｜${item.importance}` : ''}${item.accuracy ? `｜${item.accuracy}` : ''}`)).join('') : '<div class="empty-state">目前沒有新聞。</div>'}</div></section>`;
+    <section class="panel"><div class="panel-header">最新市場消息</div><div class="panel-body news-feed-native">${feed.length ? feed.map(item => eventCard(item.title || '市場消息', item.summary || '', `Day ${Number(item.day || 0)}${item.importance ? `｜${item.importance}` : ''}${item.accuracy ? `｜${item.accuracy}` : ''}`)).join('') : '<div class="empty-state">目前沒有新聞。</div>'}</div></section>`;
 }
 
 export function renderNativeProgress(state) {
