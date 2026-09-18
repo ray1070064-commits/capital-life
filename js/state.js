@@ -3,6 +3,7 @@ const initialState = {
     activeView: 'start',
     selectedSymbol: null,
     chartRange: '1M',
+    chartDays: null,
     indicators: {
       ma20: true,
       ma50: false,
