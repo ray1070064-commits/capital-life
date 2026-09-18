@@ -4,7 +4,6 @@ import {
   loadLifePanel,
   loadMarketPanel,
   loadNewsPanel,
-  loadPttPanel,
   loadPowerPanel,
   loadProgressPanel,
   loadSaveTools,
@@ -19,7 +18,6 @@ import {
   setNewsPanel,
   setPowerPanel,
   setProgressPanel,
-  setPttPanel,
   setSaveTools,
   setSettlementPanel,
 } from './state.js';
@@ -27,9 +25,8 @@ import { toast } from './ui.js';
 
 const loaders = {
   trading: async () => {
-    const [market, ptt] = await Promise.all([loadMarketPanel(), loadPttPanel()]);
+    const market = await loadMarketPanel();
     setMarketPanel(market?.market_panel || null);
-    setPttPanel(ptt?.ptt_panel || null);
   },
   life: async () => {
     const payload = await loadLifePanel();
