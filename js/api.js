@@ -225,9 +225,7 @@ export async function importLegacySave({ saveCode = null, fileBase64 = null } = 
   });
 }
 
-export async function loadGameState(includeUi = false) {
-  return request(`/state?include_ui=${includeUi ? 'true' : 'false'}`, { method: 'GET' });
-}
+export async function loadGameState() { return request('/state', { method: 'GET' }); }
 
 export async function loadChart(symbol, limit = 365) {
   return request(`/chart/${encodeURIComponent(symbol)}?limit=${encodeURIComponent(limit)}`, { method: 'GET' });
